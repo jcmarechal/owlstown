@@ -1,17 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Jean-Christophe Maréchal — Research sites</title><link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><style>html,body{margin:0;padding:0;background:transparent;font-family:Arial,Helvetica,sans-serif}#map{width:100%;height:560px;border-radius:12px;overflow:hidden}.legend{background:white;padding:10px 12px;border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,.25);line-height:20px;font-size:12px}.legend i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:7px;vertical-align:-1px}.popup-title{font-weight:700;font-size:15px;margin-bottom:5px}.popup-category{font-size:12px;font-weight:600;margin-bottom:7px}.popup-text{font-size:13px;line-height:1.45;max-width:270px}.popup-link{display:inline-block;margin-top:9px;font-size:12px;font-weight:600}.featured{font-weight:700}@media (max-width:700px){#map{height:480px}}</style></head>
-<body><div id="map"></div><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
-const sites=[
-{name:"Vise submarine spring — Thau Lagoon",lat:43.443489,lon:3.671810,category:"Coastal karst",color:"#2b83ba",featured:true,text:"A natural laboratory for coastal karst hydrogeology, including groundwater flow reversal, saltwater intrusion and freshwater–seawater interactions.",url:"https://marechal.owlstown.net/projects/5944"},
-{name:"Lez karst system",lat:43.7100,lon:3.8600,category:"Karst aquifer",color:"#4daf4a",text:"Study of groundwater resources, flow dynamics and management in a Mediterranean karst aquifer.",url:"https://marechal.owlstown.net/pages/10030"},
-{name:"Plateau de Sault karst",lat:42.8085,lon:2.0042,category:"Karst aquifer",color:"#4daf4a",text:"Study of groundwater resources and hydrogeological functioning in a Pyrenean mountainous karst system.",url:"https://marechal.owlstown.net/pages/10030"},
-{name:"Fontaine de Nîmes karst system",lat:43.8367,lon:4.3601,category:"Karst aquifer",color:"#4daf4a",text:"Study of groundwater dynamics and flood processes in a Mediterranean karst system.",url:"https://marechal.owlstown.net/pages/10030"},
-{name:"Mont-Blanc Massif",lat:45.832627,lon:6.864717,category:"Mountain groundwater",color:"#555555",text:"Study of groundwater flow, temperature and deep hydrogeological processes in fractured crystalline rocks of the Alps.",url:"https://marechal.owlstown.net/pages/10030"},
-{name:"Mule Hole forest watershed — India",lat:11.733333,lon:76.450000,category:"Fractured-rock aquifer",color:"#a65628",text:"Study of weathering processes, groundwater storage and chemical budgets in a crystalline aquifer under tropical conditions.",url:"https://marechal.owlstown.net/pages/10030"},
-{name:"Maheshwaram irrigated basin — India",lat:17.134188,lon:78.433449,category:"Fractured-rock aquifer",color:"#a65628",text:"Study of groundwater flow and storage in a crystalline-rock aquifer under semi-arid conditions and water scarcity.",url:"https://marechal.owlstown.net/pages/10030"}];
-const map=L.map("map",{scrollWheelZoom:false});L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);
-function markerIcon(s){const z=s.featured?20:14;return L.divIcon({className:"",html:`<div style="width:${z}px;height:${z}px;background:${s.color};border:${s.featured?3:2}px solid white;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.45);"></div>`,iconSize:[z,z],iconAnchor:[z/2,z/2],popupAnchor:[0,-z/2]})}
-const bounds=[];sites.forEach(s=>{const m=L.marker([s.lat,s.lon],{icon:markerIcon(s)}).addTo(map);m.bindPopup(`<div class="popup-title">${s.name}${s.featured?' <span class="featured">★</span>':''}</div><div class="popup-category">${s.category}</div><div class="popup-text">${s.text}</div><a class="popup-link" href="${s.url}" target="_blank" rel="noopener">View research site →</a>`);bounds.push([s.lat,s.lon])});map.fitBounds(bounds,{padding:[35,35]});
-const legend=L.control({position:"bottomright"});legend.onAdd=function(){const d=L.DomUtil.create("div","legend");d.innerHTML='<b>Research sites</b><br><i style="background:#a65628"></i>Fractured-rock aquifer<br><i style="background:#4daf4a"></i>Karst aquifer<br><i style="background:#2b83ba"></i>Coastal karst<br><i style="background:#555"></i>Mountain groundwater';return d};legend.addTo(map);map.once("click",()=>map.scrollWheelZoom.enable());
-</script></body></html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Karst research sites — Jean-Christophe Maréchal</title>
+
+<link rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      crossorigin=""/>
+
+<style>
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #fff;
+    color: #24435a;
+  }
+  #map { height: 620px; width: 100%; }
+  .map-title {
+    position: absolute;
+    z-index: 1000;
+    top: 14px;
+    left: 14px;
+    max-width: 390px;
+    background: rgba(255,255,255,.96);
+    padding: 14px 18px;
+    border-radius: 10px;
+    box-shadow: 0 2px 14px rgba(0,0,0,.15);
+  }
+  .map-title h2 {
+    margin: 0 0 5px;
+    font-size: 21px;
+    line-height: 1.15;
+    color: #2574a9;
+  }
+  .map-title p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .legend {
+    position: absolute;
+    z-index: 1000;
+    right: 14px;
+    bottom: 14px;
+    background: rgba(255,255,255,.96);
+    padding: 10px 12px;
+    border-radius: 9px;
+    box-shadow: 0 2px 14px rgba(0,0,0,.15);
+    font-size: 12px;
+  }
+  .legend-row { margin: 4px 0; }
+  .dot {
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: -1px;
+  }
+  .fr { background: #2ca25f; }
+  .karst { background: #277da1; }
+  .research-link {
+    display: inline-block;
+    margin-top: 9px;
+    padding: 7px 11px;
+    background: #2ca25f;
+    color: white !important;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .research-link:hover { opacity: .85; }
+  .popup-title {
+    color: #2574a9;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .popup-type {
+    color: #2ca25f;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 7px;
+  }
+  .popup-text {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+  .leaflet-popup-content { margin: 13px 15px; }
+  @media (max-width: 700px) {
+    #map { height: 520px; }
+    .map-title { max-width: 270px; }
+    .map-title h2 { font-size: 17px; }
+    .legend { display: none; }
+  }
+</style>
+</head>
+
+<body>
+
+<div id="map">
+  <div class="map-title">
+    <h2>Karst research sites</h2>
+    <p>Field sites featured in the exhibition <em>Le Karst — une ressource en eau d’importance mondiale</em>.</p>
+  </div>
+
+  <div class="legend">
+    <div class="legend-row"><span class="dot fr"></span>France</div>
+    <div class="legend-row"><span class="dot karst"></span>Karst / groundwater research</div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        crossorigin=""></script>
+
+<script>
+const map = L.map('map', {
+  scrollWheelZoom: false,
+  zoomControl: true
+}).setView([44.1, 3.0], 6);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+/*
+  The locations below are approximate map positions for the named
+  research/exhibition sites. The scientific descriptions are based
+  on the exhibition content.
+*/
+
+const sites = [
+  {
+    name: "Vise karst system & Thau Lagoon",
+    coords: [43.45, 3.68],
+    type: "Coastal karst aquifer · France",
+    text: "Flow reversal at the Vise submarine spring and saltwater intrusion in the Thau Lagoon.",
+    link: "https://marechal.owlstown.net/pages/10027",
+    linkText: "Explore Vise & Thau →"
+  },
+  {
+    name: "Mule Hole forest watershed",
+    coords: [11.65, 76.45],
+    type: "Crystalline aquifer · India",
+    text: "Study of weathering processes and the chemical budget of a crystalline aquifer under tropical conditions.",
+    link: "https://marechal.owlstown.net/people",
+    linkText: "Explore research sites →"
+  },
+  {
+    name: "Mont-Blanc Mountain",
+    coords: [45.83, 6.87],
+    type: "Alpine hydrogeology · France & Italy",
+    text: "Groundwater flow, temperature and induced seismicity at great depths in the Alps.",
+    link: "https://marechal.owlstown.net/people/2569-mont-blanc-mountain-france-italy",
+    linkText: "Explore Mont-Blanc →"
+  },
+  {
+    name: "Lez karst system",
+    coords: [43.73, 3.85],
+    type: "Karst aquifer · France",
+    text: "Active management of a major karst aquifer and groundwater resource supplying Montpellier.",
+    link: "https://marechal.owlstown.net/people/2570-lez-karst-system-france",
+    linkText: "Explore the Lez site →"
+  },
+  {
+    name: "Maheshwaram irrigated basin",
+    coords: [17.25, 78.45],
+    type: "Crystalline-rock aquifer · India",
+    text: "Crystalline-rock aquifer under semi-arid conditions, irrigation pressure and water scarcity.",
+    link: "https://marechal.owlstown.net/people",
+    linkText: "Explore research sites →"
+  },
+  {
+    name: "Nsimi forest catchment",
+    coords: [3.17, 11.55],
+    type: "Tropical humid watershed · Cameroon",
+    text: "The hydrological and chemical role of a swamp in a tropical humid environment.",
+    link: "https://marechal.owlstown.net/people",
+    linkText: "Explore research sites →"
+  },
+  {
+    name: "Plateau de Sault karst",
+    coords: [42.84, 2.10],
+    type: "Mountain karst · France",
+    text: "Groundwater resources in a Pyrenean mountainous karst system.",
+    link: "https://marechal.owlstown.net/people",
+    linkText: "Explore research sites →"
+  },
+  {
+    name: "Fontaine de Nîmes karst system",
+    coords: [43.8367, 4.3601],
+    type: "Urban karst · France",
+    text: "Flash floods and groundwater behaviour in an urban karst system under a Mediterranean climate.",
+    link: "https://marechal.owlstown.net/people/2550-france-fontaine-de-nimes-karst-system",
+    linkText: "Explore Nîmes research →"
+  },
+  {
+    name: "Grotte d'Orgnac",
+    coords: [44.318, 4.411],
+    type: "Karst cave · France",
+    text: "High-speed observations of falling water drops and their impacts on stalagmites, linking drop dispersion to stalagmite growth.",
+    link: "https://marechal.owlstown.net/publications",
+    linkText: "See related publications →"
+  }
+]
+
+const bounds = [];
+
+sites.forEach(site => {
+  const marker = L.circleMarker(site.coords, {
+    radius: 8,
+    weight: 2,
+    color: '#ffffff',
+    fillColor: '#2ca25f',
+    fillOpacity: 0.95
+  }).addTo(map);
+
+  marker.bindPopup(`
+    <div class="popup-title">${site.name}</div>
+    <div class="popup-type">${site.type}</div>
+    <div class="popup-text">${site.text}</div>
+    <a class="research-link" href="${site.link}" target="_top">${site.linkText}</a>
+  `);
+
+  bounds.push(site.coords);
+});
+
+map.fitBounds(bounds, {
+  padding: [35, 35]
+});
+</script>
+
+</body>
+</html>
