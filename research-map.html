@@ -1,238 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Karst research sites — Jean-Christophe Maréchal</title>
-
-<link rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      crossorigin=""/>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Sites – Jean-Christophe Maréchal</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+ integrity="sha256-p4NxAoJBhIINfQ3cXqvQ5v0G0VQfQ9R8xQ6j8m5mQ9E=" crossorigin="">
 <style>
-  html, body { height: 100%; margin: 0; }
-  body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #fff;
-    color: #24435a;
-  }
-  #map { height: 620px; width: 100%; }
-  .map-title {
-    position: absolute;
-    z-index: 1000;
-    top: 14px;
-    left: 14px;
-    max-width: 390px;
-    background: rgba(255,255,255,.96);
-    padding: 14px 18px;
-    border-radius: 10px;
-    box-shadow: 0 2px 14px rgba(0,0,0,.15);
-  }
-  .map-title h2 {
-    margin: 0 0 5px;
-    font-size: 21px;
-    line-height: 1.15;
-    color: #2574a9;
-  }
-  .map-title p {
-    margin: 0;
-    font-size: 13px;
-    line-height: 1.4;
-  }
-  .legend {
-    position: absolute;
-    z-index: 1000;
-    right: 14px;
-    bottom: 14px;
-    background: rgba(255,255,255,.96);
-    padding: 10px 12px;
-    border-radius: 9px;
-    box-shadow: 0 2px 14px rgba(0,0,0,.15);
-    font-size: 12px;
-  }
-  .legend-row { margin: 4px 0; }
-  .dot {
-    display: inline-block;
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    margin-right: 6px;
-    vertical-align: -1px;
-  }
-  .fr { background: #2ca25f; }
-  .karst { background: #277da1; }
-  .research-link {
-    display: inline-block;
-    margin-top: 9px;
-    padding: 7px 11px;
-    background: #2ca25f;
-    color: white !important;
-    text-decoration: none;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 12px;
-  }
-  .research-link:hover { opacity: .85; }
-  .popup-title {
-    color: #2574a9;
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-  .popup-type {
-    color: #2ca25f;
-    font-size: 12px;
-    font-weight: 700;
-    margin-bottom: 7px;
-  }
-  .popup-text {
-    font-size: 13px;
-    line-height: 1.4;
-  }
-  .leaflet-popup-content { margin: 13px 15px; }
-  @media (max-width: 700px) {
-    #map { height: 520px; }
-    .map-title { max-width: 270px; }
-    .map-title h2 { font-size: 17px; }
-    .legend { display: none; }
-  }
+html,body{margin:0;padding:0;width:100%;height:100%;font-family:Arial,Helvetica,sans-serif}
+#research-map{width:100%;height:700px;min-height:500px;border-radius:12px;overflow:hidden}
+.site-popup h3{margin:0 0 6px;font-size:16px}
+.site-popup p{margin:0 0 8px;line-height:1.4}
+.site-popup a{font-weight:600;text-decoration:none}
+.map-legend{background:rgba(255,255,255,.95);padding:10px 12px;line-height:1.45;border-radius:6px;box-shadow:0 1px 5px rgba(0,0,0,.25);font-size:13px}
+.map-legend strong{display:block;margin-bottom:4px}
+@media(max-width:700px){#research-map{height:560px}}
 </style>
 </head>
-
 <body>
-
-<div id="map">
-  <div class="map-title">
-    <h2>Karst research sites</h2>
-    <p>Field sites featured in the exhibition <em>Le Karst — une ressource en eau d’importance mondiale</em>.</p>
-  </div>
-
-  <div class="legend">
-    <div class="legend-row"><span class="dot fr"></span>France</div>
-    <div class="legend-row"><span class="dot karst"></span>Karst / groundwater research</div>
-  </div>
-</div>
-
+<div id="research-map"></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        crossorigin=""></script>
-
+ integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
-const map = L.map('map', {
-  scrollWheelZoom: false,
-  zoomControl: true
-}).setView([44.1, 3.0], 6);
+const sites = [
+    {
+      name: 'Vise & Thau',
+      country: 'France',
+      lat: 43.444,
+      lon: 3.663,
+      description: 'Karst spring and saltwater intrusion / inversac system.',
+      url: 'https://marechal.owlstown.net/pages/10148'
+    },
+    {
+      name: 'Lez',
+      country: 'France',
+      lat: 43.695,
+      lon: 3.848,
+      description: 'Hydrogeological investigations and modelling of the Lez karst system.',
+      url: 'https://marechal.owlstown.net/pages/10076'
+    },
+    {
+      name: 'Fontaine de Nîmes',
+      country: 'France',
+      lat: 43.835,
+      lon: 4.36,
+      description: 'Karst hydrogeology of the Fontaine de Nîmes system.',
+      url: 'https://marechal.owlstown.net/pages/10064'
+    },
+    {
+      name: 'Mont-Blanc Tunnel',
+      country: 'Alps, France–Italy',
+      lat: 45.9,
+      lon: 6.87,
+      description: 'Groundwater flow, thermal anomalies and tunnel inflows in fractured crystalline rocks.',
+      url: 'https://marechal.owlstown.net/pages/10144'
+    },
+    {
+      name: 'Plateau de Sault',
+      country: 'France',
+      lat: 42.83,
+      lon: 2.0,
+      description: 'Hydrogeological research in a karstic and fractured mountain environment.',
+      url: 'https://marechal.owlstown.net/pages/10288'
+    },
+    {
+      name: 'Maheshwaram',
+      country: 'India',
+      lat: 17.2,
+      lon: 78.43,
+      description: 'Hard-rock aquifer functioning, weathered mantle and fractured crystalline bedrock.',
+      url: 'https://marechal.owlstown.net/pages/10073'
+    },
+    {
+      name: 'Mule Hole',
+      country: 'India',
+      lat: 11.98,
+      lon: 76.62,
+      description: 'Hydrogeological research on groundwater flow and recharge in crystalline rocks.',
+      url: 'https://marechal.owlstown.net/pages/10074'
+    },
+    {
+      name: 'Choutuppal',
+      country: 'India',
+      lat: 17.25,
+      lon: 78.9,
+      description: 'Hard-rock aquifer research and groundwater recharge.',
+      url: 'https://marechal.owlstown.net/pages/10146'
+    },
+    {
+      name: 'Nsimi',
+      country: 'Cameroon',
+      lat: 3.2,
+      lon: 11.75,
+      description: 'Hydrogeological research on groundwater–surface water interactions and recharge.',
+      url: 'https://marechal.owlstown.net/pages/10147'
+    }
+];
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  maxZoom: 18,
-  attribution: '&copy; OpenStreetMap contributors'
+const map = L.map("research-map", {scrollWheelZoom:false, worldCopyJump:true});
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  maxZoom:18,
+  attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
-/*
-  The locations below are approximate map positions for the named
-  research/exhibition sites. The scientific descriptions are based
-  on the exhibition content.
-*/
-
-const sites = [
-  {
-    name: "Vise karst system & Thau Lagoon",
-    coords: [43.45, 3.68],
-    type: "Coastal karst aquifer · France",
-    text: "Flow reversal at the Vise submarine spring and saltwater intrusion in the Thau Lagoon.",
-    link: "https://marechal.owlstown.net/pages/10027",
-    linkText: "Explore Vise & Thau →"
-  },
-  {
-    name: "Mule Hole forest watershed",
-    coords: [11.65, 76.45],
-    type: "Crystalline aquifer · India",
-    text: "Study of weathering processes and the chemical budget of a crystalline aquifer under tropical conditions.",
-    link: "https://marechal.owlstown.net/people",
-    linkText: "Explore research sites →"
-  },
-  {
-    name: "Mont-Blanc Mountain",
-    coords: [45.83, 6.87],
-    type: "Alpine hydrogeology · France & Italy",
-    text: "Groundwater flow, temperature and induced seismicity at great depths in the Alps.",
-    link: "https://marechal.owlstown.net/people/2569-mont-blanc-mountain-france-italy",
-    linkText: "Explore Mont-Blanc →"
-  },
-  {
-    name: "Lez karst system",
-    coords: [43.73, 3.85],
-    type: "Karst aquifer · France",
-    text: "Active management of a major karst aquifer and groundwater resource supplying Montpellier.",
-    link: "https://marechal.owlstown.net/people/2570-lez-karst-system-france",
-    linkText: "Explore the Lez site →"
-  },
-  {
-    name: "Maheshwaram irrigated basin",
-    coords: [17.25, 78.45],
-    type: "Crystalline-rock aquifer · India",
-    text: "Crystalline-rock aquifer under semi-arid conditions, irrigation pressure and water scarcity.",
-    link: "https://marechal.owlstown.net/people",
-    linkText: "Explore research sites →"
-  },
-  {
-    name: "Nsimi forest catchment",
-    coords: [3.17, 11.55],
-    type: "Tropical humid watershed · Cameroon",
-    text: "The hydrological and chemical role of a swamp in a tropical humid environment.",
-    link: "https://marechal.owlstown.net/people",
-    linkText: "Explore research sites →"
-  },
-  {
-    name: "Plateau de Sault karst",
-    coords: [42.84, 2.10],
-    type: "Mountain karst · France",
-    text: "Groundwater resources in a Pyrenean mountainous karst system.",
-    link: "https://marechal.owlstown.net/people",
-    linkText: "Explore research sites →"
-  },
-  {
-    name: "Fontaine de Nîmes karst system",
-    coords: [43.8367, 4.3601],
-    type: "Urban karst · France",
-    text: "Flash floods and groundwater behaviour in an urban karst system under a Mediterranean climate.",
-    link: "https://marechal.owlstown.net/people/2550-france-fontaine-de-nimes-karst-system",
-    linkText: "Explore Nîmes research →"
-  },
-  {
-    name: "Grotte d'Orgnac",
-    coords: [44.318, 4.411],
-    type: "Karst cave · France",
-    text: "High-speed observations of falling water drops and their impacts on stalagmites, linking drop dispersion to stalagmite growth.",
-    link: "https://marechal.owlstown.net/publications",
-    linkText: "See related publications →"
-  }
-]
-
 const bounds = [];
-
 sites.forEach(site => {
-  const marker = L.circleMarker(site.coords, {
-    radius: 8,
-    weight: 2,
-    color: '#ffffff',
-    fillColor: '#2ca25f',
-    fillOpacity: 0.95
-  }).addTo(map);
-
+  const marker = L.marker([site.lat,site.lon]).addTo(map);
   marker.bindPopup(`
-    <div class="popup-title">${site.name}</div>
-    <div class="popup-type">${site.type}</div>
-    <div class="popup-text">${site.text}</div>
-    <a class="research-link" href="${site.link}" target="_top">${site.linkText}</a>
+    <div class="site-popup">
+      <h3>${site.name}</h3>
+      <p><strong>${site.country}</strong></p>
+      <p>${site.description}</p>
+      <a href="${site.url}" target="_blank" rel="noopener noreferrer">View case study →</a>
+    </div>
   `);
-
-  bounds.push(site.coords);
+  bounds.push([site.lat,site.lon]);
 });
+map.fitBounds(bounds, {padding:[35,35]});
 
-map.fitBounds(bounds, {
-  padding: [35, 35]
-});
+const legend = L.control({position:"bottomright"});
+legend.onAdd = function() {
+  const div = L.DomUtil.create("div","map-legend");
+  div.innerHTML = "<strong>Selected research sites</strong>Click a marker to open the case study.";
+  return div;
+};
+legend.addTo(map);
+setTimeout(() => map.invalidateSize(), 300);
 </script>
-
 </body>
 </html>
